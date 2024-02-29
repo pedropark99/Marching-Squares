@@ -1,0 +1,11 @@
+[package]
+name = "marching_squares"
+version = "0.1.0"
+edition = "2021"
+
+[dependecies]
+
+[dependencies]
+array2d = "0.3.2"
+json = "0.12.4"
+noise = "0.8.2"

@@ -1,6 +1,7 @@
 use noise::{NoiseFn, OpenSimplex};
 use array2d::Array2D;
-use libm;
+use json;
+use json::{JsonValue, JsonError};
 
 
 pub struct FlowField {
@@ -59,10 +60,49 @@ impl FlowField {
 }
 
 
+pub fn get_cases() -> JsonValue {
+    let cases = r#"[
+      {},
+      {"x": [1.0, 1.5], "y": [0.5, 1.0]},
+      {"x": [1.5, 1.0], "y": [1.0, 1.5]},
+      {"x": [1.5, 1.0], "y": [0.5, 1.0]},
+      {"x": [1.0, 0.5], "y": [1.5, 1.0]},
+      {"x": [1.0, 1.5, 0.5, 1.0], "y": [1.0, 0.5, 1.5, 1.0]},
+      {"x": [1.0, 0.5], "y": [1.0, 1.5]},
+      {"x": [1.0, 0.5], "y": [0.5, 1.0]},
+      {"x": [0.5, 1.0], "y": [1.0, 0.5]},
+      {"x": [1.0, 1.5], "y": [1.0, 0.5]},
+      {"x": [0.5, 1.0, 1.0, 0.5], "y": [1.5, 1.0, 1.0, 1.5]},
+      {"x": [1.5, 1.0], "y": [1.0, 0.5]},
+      {"x": [0.5, 1.0], "y": [1.5, 1.0]},
+      {"x": [1.0, 1.5], "y": [1.5, 1.0]},
+      {"x": [0.5, 1.0], "y": [1.0, 1.5]},
+      {}
+    ]"#;
+    let as_dict = json::parse(cases).unwrap();
+    return as_dict
+}
+
+
+pub fn threshhold(grid:&FlowField, width:u32, height:u32) -> Array2D<u8> {
+    let mut grid = Array2D::filled_with(0 as u8, width as usize, height as usize);
+    for x in 0..width as usize {
+        for y in 0..height as usize {
+            grid[(x, y)] = (grid[(x, y)] > 0) as u8
+        }
+    }
+    return grid
+}
 
 
 
-pub fn main() -> void {
+pub fn main() {
+    let width = 100;
+    let height = 100;
     let flow_field = FlowField::new(50, 100, 100);
+    let binary_grid = threshhold(&flow_field, width, height);
+    let dx = 1;
+    let dy = 1;
+
 
 }
