@@ -71,6 +71,47 @@ pub fn threshold(noise_field:&NoiseField, width:u32, height:u32) -> Array2D<u8> 
     return grid
 }
 
+pub fn off_boundaries(x:usize, y:usize, limit:usize) -> bool {
+    x <= 0 ||
+    y <= 0 ||
+    x >= limit ||
+    y >= limit
+}
+
+
+pub fn get_square(binary_grid:&Array2D<u8>, x:usize, y:usize) -> Vec<u8> {
+    let values = vec![
+        binary_grid[(x, y)],
+        binary_grid[(x, y + 1)],
+        binary_grid[(x + 1, y + 1)],
+        binary_grid[(x + 1, y)],
+    ];
+    values
+}
+
+pub fn calc_case_index(square: Vec<u8>) -> u8 {
+    let case_index = square[0] * 8
+        + square[1] * 4
+        + square[2] * 2
+        + square[3] * 1;
+
+    case_index
+}
+
+
+struct Polygon {
+    case_index: u8,
+    x: Vec<f64>,
+    y: Vec<f64>,
+}
+
+// Each pixel is filled with a polygon
+struct Pixel {
+    grid_x: u32,
+    grid_y: u32,
+    fill: Polygon
+}
+
 
 
 pub fn main() {
@@ -81,9 +122,41 @@ pub fn main() {
     let dx = 1;
     let dy = 1;
 
-    for x in 0..width as usize {
-        for y in 0..height as usize {
-            a
+    let a: [f64; 2] = [0.0, 1.0];
+    let b: [f64; 2] = [1.0, 1.0];
+    let c: [f64; 2] = [1.0, 0.0];
+    let d: [f64; 2] = [0.0, 0.0];
+    let ab: [f64; 2] = [0.5, 1.0];
+    let bc: [f64; 2] = [1.0, 0.5];
+    let cd: [f64; 2] = [0.5, 0.0];
+    let da: [f64; 2] = [0.0, 0.5];
+    let cases = vec![
+        (0, vec![0.0], vec![0.0]),
+        (1, vec![d[0], cd[0], da[0]], vec![d[1], cd[1], da[1]]),
+        (2, vec![c[0], cd[0], bc[0]], vec![c[1], cd[1], bc[1]]),
+        (3, vec![d[0], c[0], bc[0], da[0]], vec![d[1], c[1], bc[1], da[1]]),
+        (4, vec![b[0], ab[0], bc[0]], vec![b[1], ab[1], bc[1]]),
+        (5, vec![d[0], da[0], ab[0], b[0], bc[0], cd[0]], vec![d[1], da[1], ab[1], b[1], bc[1], cd[1]]),
+        (6, vec![ab[0], b[0], c[0], cd[0]], vec![ab[1], b[1], c[1], cd[1]]),
+        (7, vec![da[0], d[0], c[0], b[0], ab[0]], vec![da[1], d[1], c[1], b[1], ab[1]]),
+        (8, vec![a[0], ab[0], da[0]], vec![a[1], ab[1], da[1]]),
+        (9, vec![a[0], ab[0], cd[0], d[0]], vec![a[1], ab[1], cd[1], d[1]]),
+        (10, vec![a[0], ab[0], bc[0], c[0], cd[0], da[0]], vec![a[1], ab[1], bc[1], c[1], cd[1], da[1]]),
+        (11, vec![a[0], ab[0], bc[0], c[0], d[0]], vec![a[1], ab[1], bc[1], c[1], d[1]]),
+        (12, vec![a[0], b[0], bc[0], da[0]], vec![a[1], b[1], bc[1], da[1]]),
+        (13, vec![a[0], b[0], bc[0], cd[0], d[0]], vec![a[1], b[1], bc[1], cd[1], d[1]]),
+        (14, vec![a[0], b[0], c[0], cd[0], da[0]], vec![a[1], b[1], c[1], cd[1], da[1]]),
+        (15, vec![a[0], b[0], c[0], d[0]], vec![a[1], b[1], c[1], d[1]]),
+    ];
+
+
+
+
+    for x in 0..(width - 1) as usize {
+        for y in 0..(height - 1) as usize {
+            let square = get_square(&binary_grid, x, y);
+            let case_index = calc_case_index(square);
+            println!("{}\n", case_index);
         }
     }
 
