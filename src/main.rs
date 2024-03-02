@@ -98,7 +98,6 @@ pub fn calc_case_index(square: Vec<u8>) -> u8 {
     case_index
 }
 
-
 struct Polygon {
     case_index: u8,
     x: Vec<f64>,
@@ -107,8 +106,8 @@ struct Polygon {
 
 // Each pixel is filled with a polygon
 struct Pixel {
-    grid_x: u32,
-    grid_y: u32,
+    grid_x: usize,
+    grid_y: usize,
     fill: Polygon
 }
 
@@ -131,32 +130,42 @@ pub fn main() {
     let cd: [f64; 2] = [0.5, 0.0];
     let da: [f64; 2] = [0.0, 0.5];
     let cases = vec![
-        (0, vec![0.0], vec![0.0]),
-        (1, vec![d[0], cd[0], da[0]], vec![d[1], cd[1], da[1]]),
-        (2, vec![c[0], cd[0], bc[0]], vec![c[1], cd[1], bc[1]]),
-        (3, vec![d[0], c[0], bc[0], da[0]], vec![d[1], c[1], bc[1], da[1]]),
-        (4, vec![b[0], ab[0], bc[0]], vec![b[1], ab[1], bc[1]]),
-        (5, vec![d[0], da[0], ab[0], b[0], bc[0], cd[0]], vec![d[1], da[1], ab[1], b[1], bc[1], cd[1]]),
-        (6, vec![ab[0], b[0], c[0], cd[0]], vec![ab[1], b[1], c[1], cd[1]]),
-        (7, vec![da[0], d[0], c[0], b[0], ab[0]], vec![da[1], d[1], c[1], b[1], ab[1]]),
-        (8, vec![a[0], ab[0], da[0]], vec![a[1], ab[1], da[1]]),
-        (9, vec![a[0], ab[0], cd[0], d[0]], vec![a[1], ab[1], cd[1], d[1]]),
-        (10, vec![a[0], ab[0], bc[0], c[0], cd[0], da[0]], vec![a[1], ab[1], bc[1], c[1], cd[1], da[1]]),
-        (11, vec![a[0], ab[0], bc[0], c[0], d[0]], vec![a[1], ab[1], bc[1], c[1], d[1]]),
-        (12, vec![a[0], b[0], bc[0], da[0]], vec![a[1], b[1], bc[1], da[1]]),
-        (13, vec![a[0], b[0], bc[0], cd[0], d[0]], vec![a[1], b[1], bc[1], cd[1], d[1]]),
-        (14, vec![a[0], b[0], c[0], cd[0], da[0]], vec![a[1], b[1], c[1], cd[1], da[1]]),
-        (15, vec![a[0], b[0], c[0], d[0]], vec![a[1], b[1], c[1], d[1]]),
+        Polygon  { case_index: 0, x: vec![0.0], y: vec![0.0] },
+        Polygon  { case_index: 1, x: vec![d[0], cd[0], da[0]], y: vec![d[1], cd[1], da[1]] },
+        Polygon  { case_index: 2, x: vec![c[0], cd[0], bc[0]], y: vec![c[1], cd[1], bc[1]] },
+        Polygon  { case_index: 3, x: vec![d[0], c[0], bc[0], da[0]], y: vec![d[1], c[1], bc[1], da[1]] },
+        Polygon  { case_index: 4, x: vec![b[0], ab[0], bc[0]], y: vec![b[1], ab[1], bc[1]] },
+        Polygon  { case_index: 5, x: vec![d[0], da[0], ab[0], b[0], bc[0], cd[0]], y: vec![d[1], da[1], ab[1], b[1], bc[1], cd[1]] },
+        Polygon  { case_index: 6, x: vec![ab[0], b[0], c[0], cd[0]], y: vec![ab[1], b[1], c[1], cd[1]] },
+        Polygon  { case_index: 7, x: vec![da[0], d[0], c[0], b[0], ab[0]], y: vec![da[1], d[1], c[1], b[1], ab[1]] },
+        Polygon  { case_index: 8, x: vec![a[0], ab[0], da[0]], y: vec![a[1], ab[1], da[1]] },
+        Polygon  { case_index: 9, x: vec![a[0], ab[0], cd[0], d[0]], y: vec![a[1], ab[1], cd[1], d[1]] },
+        Polygon  { case_index: 10, x: vec![a[0], ab[0], bc[0], c[0], cd[0], da[0]], y: vec![a[1], ab[1], bc[1], c[1], cd[1], da[1]] },
+        Polygon  { case_index: 11, x: vec![a[0], ab[0], bc[0], c[0], d[0]], y: vec![a[1], ab[1], bc[1], c[1], d[1]] },
+        Polygon  { case_index: 12, x: vec![a[0], b[0], bc[0], da[0]], y: vec![a[1], b[1], bc[1], da[1]] },
+        Polygon  { case_index: 13, x: vec![a[0], b[0], bc[0], cd[0], d[0]], y: vec![a[1], b[1], bc[1], cd[1], d[1]] },
+        Polygon  { case_index: 14, x: vec![a[0], b[0], c[0], cd[0], da[0]], y: vec![a[1], b[1], c[1], cd[1], da[1]] },
+        Polygon  { case_index: 15, x: vec![a[0], b[0], c[0], d[0]], y: vec![a[1], b[1], c[1], d[1]] },
     ];
 
 
 
-
+    let mut pixels:Vec<Pixel> = Vec::with_capacity(binary_grid.num_rows().pow(2) as usize);
     for x in 0..(width - 1) as usize {
         for y in 0..(height - 1) as usize {
             let square = get_square(&binary_grid, x, y);
             let case_index = calc_case_index(square);
-            println!("{}\n", case_index);
+            let polygon = cases.get(case_index as usize).unwrap();
+            let pixel = Pixel {
+                grid_x: x, grid_y: y,
+                fill: Polygon {
+                    case_index: polygon.case_index,
+                    x: polygon.x.clone(),
+                    y: polygon.y.clone()
+                }
+            };
+
+            pixels.push(pixel);
         }
     }
 
